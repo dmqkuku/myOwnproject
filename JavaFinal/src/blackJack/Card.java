@@ -2,25 +2,11 @@ package blackJack;
 
 public class Card {
 	private String pattern;
-	private String JQK;
 	private int number;
-	//JQK는 잭, 퀸, 킹
-	//number는 1에서 10, ace의 경우 11의 값을 나타냄...
-	//pattern은 스페이드, 클로버, 퀸, 킹
-
+	
 	public Card(String pattern, int number) {
 		this.pattern = pattern;
 		this.number = number;
-
-	}
-
-	public String getJQK() {
-		return JQK;
-	}
-	
-
-	public void setJQK(String jQK) {
-		JQK = jQK;
 	}
 
 	public Card() {
@@ -53,18 +39,17 @@ public class Card {
 	@Override
 	public boolean equals(Object obj) {
 		// TODO Auto-generated method stub
-		if (obj instanceof Card) {
-			Card c = (Card) obj;
-			return c.number == this.number && c.pattern.equals(this.pattern);
-		}
-		return false;
-
+		if(obj instanceof Card) {
+			Card c = (Card)obj;
+			return c.number ==this.number && c.pattern.equals(this.pattern);
+		}return false;
+				
 	}
 
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
-		return String.format("|%s - %d|\t", this.pattern, this.number);
+		return String.format("|%s - %d|\t", this.pattern , this.number);
 	}
-
+	
 }
