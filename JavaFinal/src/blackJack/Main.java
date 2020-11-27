@@ -1,8 +1,10 @@
 package blackJack;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -160,8 +162,8 @@ public class Main {
 						break;
 					if (input.equals("double")){
 						if(doublePossible) {
-							List<Person> tempP = new ArrayList<>();
-							tempP.add(new Player(p.getName()));
+							Map<String , Person> tempP = new HashMap<>();
+							tempP.put(p.getName(), new Player(p.getName()));
 						}
 					}
 				}
