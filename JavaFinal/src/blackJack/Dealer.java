@@ -40,7 +40,8 @@ public class Dealer implements Person {
 		} else
 			;
 		this.dealGoOn = false;
-	}
+	}//딜러의 hit은 간단한 ai의 연장임
+	//만일 tempsum이 16이상이면 더이상 뽑지 않고 중단함...
 
 	public void ai() {
 
@@ -58,7 +59,8 @@ public class Dealer implements Person {
 		} else
 			this.hit();
 
-	}
+	}//ai는 dealer클래스 만을 위한 메소드임
+	// 만일 tempsum이 블랙잭인지 버스트인지 체크하고 hit으로 넘겨줌
 
 	@Override
 	public int getSum() {
