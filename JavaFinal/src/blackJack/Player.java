@@ -27,6 +27,16 @@ public class Player implements Person {
 		
 	}
 
+	
+	
+	
+	public String getName() {
+		return name;
+	}
+
+
+
+
 	@Override
 	public int hashCode() {
 		// TODO Auto-generated method stub

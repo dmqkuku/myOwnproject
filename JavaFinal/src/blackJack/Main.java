@@ -37,22 +37,18 @@ public class Main {
 		Card tempCard = new Card();
 		switch (pattern1) { // 패턴은 1에서 4 사이의 무작위 정수,,, 패턴 값에 따른 switch문을 돌림
 		case 1: {
-
 			tempCard.setPattern("Spade");
 			break;
 		}
 		case 2: {
-
 			tempCard.setPattern("Clover");
 			break;
 		}
 		case 3: {
-
 			tempCard.setPattern("Diamond");
 			break;
 		}
 		case 4: {
-
 			tempCard.setPattern("Heart");
 			break;
 		}
@@ -108,7 +104,7 @@ public class Main {
 	}
 
 	static Scanner scanner = new Scanner(System.in);
-
+	static boolean doublePossible;
 	public static void main(String[] args) {
 
 		List<Person> playerList = new ArrayList<>();
@@ -124,6 +120,21 @@ public class Main {
 			for (Person p : playerList) { // playerlist의 각 person에 대하여
 				p.emtyDeck(); // 라운드의 시작시점에서 deck을 비웁니다.
 				p.turn(); // 두장 받아오기
+				Set<Card> tempSet = p.getSet();
+				Iterator<Card> iter = tempSet.iterator();
+				int num1 = iter.next().getNumber();
+				int num2 = iter.next().getNumber();
+				if(num1 > 10 || num2 > 10) {
+					iter = tempSet.iterator();
+					String str1 = iter.next().getJQK();
+					String str2 = iter.next().getJQK();
+					if(str1.equals(str2)) {
+						doublePossible = (num1 == num2) &&str1.equals(str2);
+					}
+					
+				}else doublePossible = num1 == num2;
+				System.out.println(doublePossible);
+				
 
 				System.out.println(p.toString());
 				System.out.println(p.getSet());
@@ -147,10 +158,12 @@ public class Main {
 					}
 					if (input.equals("stand"))
 						break;
-					if (input.equals("double")) {
-
+					if (input.equals("double")){
+						if(doublePossible) {
+							List<Person> tempP = new ArrayList<>();
+							tempP.add(new Player(p.getName()));
+						}
 					}
-
 				}
 			}
 			dealer.ai();

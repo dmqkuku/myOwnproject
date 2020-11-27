@@ -9,7 +9,7 @@ public interface Person /*extends Comparable*/{
 	public void turn();
 	public void hit();
 	public int getSum();
-	
+	public String getName();
 	public void emtyDeck();
 	public boolean getBurst();
 	public boolean getBJ();

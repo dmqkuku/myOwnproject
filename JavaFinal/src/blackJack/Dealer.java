@@ -90,4 +90,10 @@ public class Dealer implements Person {
 		this.dealGoOn = true;
 	}
 
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
