@@ -102,30 +102,43 @@ let cardProcessor2 = cardProcessor1.forEach((value, index, arr) =>{
     if()
 })*/
 
+function getSum(cG, Iindex){
+    let resSum = 0;
+    for(let i = 1 ; i <=Iindex ; ++i){
+        resSum += cG["Hand" + i].number; 
+    }
+    return resSum;
+}
+
 
 function cardProcessor(cG, index){
     let tempArr = [...cG[index].pattern];
-    console.log(tempArr);
+    function Helper(Tarr){
+        Tarr.pop(Tarr.find(value => {typeof value == "number"}));
+        Tarr.pop(Tarr.find(value => {typeof value == "number"}));
+    }
+    
     if(cG){
         if(cG[index].number == 11){
             cG[index].number = 10;
             /*delete cG[index].pattern[cG[index].pattern.length-1];
             delete cG[index].pattern[cG[index].pattern.length-1];*/
-            tempArr.pop(tempArr.find(value => {typeof value == "number"}))
-            tempArr.pop(tempArr.find(value => {typeof value == "number"}))
+            /*tempArr.pop(tempArr.find(value => {typeof value == "number"}))
+            tempArr.pop(tempArr.find(value => {typeof value == "number"}))*/
             /*let str = "";
             for(let letter of tempArr){
                 str += letter;
             }*/
+            Helper(tempArr);
             let str = tempArr.join("");
             cG[index].pattern = str + "Jack";
             //cG[index].pattern.replace(`11`, "Jack");*/
             return cG;
         }else if(cG[index].number == 12){
             cG[index].number = 10;
-        
-            tempArr.pop(tempArr.find(value => {typeof value == "number"}))
-            tempArr.pop(tempArr.find(value => {typeof value == "number"}))
+            Helper(tempArr);
+            //tempArr.pop(tempArr.find(value => {typeof value == "number"}))
+            //tempArr.pop(tempArr.find(value => {typeof value == "number"}))
             let str = "";
             for(let letter of tempArr){
                 str += letter;
@@ -135,9 +148,9 @@ function cardProcessor(cG, index){
             return cG;
         }else if(cG[index].number == 13){
             cG[index].number = 10;
-            
-            tempArr.pop(tempArr.find(value => {typeof value == "number"}))
-            tempArr.pop(tempArr.find(value => {typeof value == "number"}))
+            Helper(tempArr);
+            //tempArr.pop(tempArr.find(value => {typeof value == "number"}))
+            //tempArr.pop(tempArr.find(value => {typeof value == "number"}))
             /*let str = "";
             //
             for(let letter of tempArr){
@@ -152,10 +165,10 @@ function cardProcessor(cG, index){
             
             if(inputC == "y"){
                 cG[index].number = 11;
-
+                Helper(tempArr);
                 //tempArr.splice(-1, 2);???
-                tempArr.pop(tempArr.find(value => {typeof value == "number"}))
-                tempArr.pop(tempArr.find(value => {typeof value == "number"}))
+                //tempArr.pop(tempArr.find(value => {typeof value == "number"}))
+                //tempArr.pop(tempArr.find(value => {typeof value == "number"}))
                 /*let str = "";
                 for(let letter of tempArr){
                     str += letter;
@@ -164,9 +177,9 @@ function cardProcessor(cG, index){
                 cG[index].pattern = str + "Ace";
             }else {
                 cG[index].number = 1;
-
-                tempArr.pop(tempArr.find(value => {typeof value == "number"}))
-                tempArr.pop(tempArr.find(value => {typeof value == "number"}))
+                Helper(tempArr);
+                //tempArr.pop(tempArr.find(value => {typeof value == "number"}))
+                //tempArr.pop(tempArr.find(value => {typeof value == "number"}))
                 /*let str = "";
                 for(let letter of tempArr){
                     str += letter;
@@ -177,19 +190,21 @@ function cardProcessor(cG, index){
             
         }else if((cG[index].number == 1)&&cG == dealerHand){
             let dHIndex = Number(index[4]);
-            let tempSum = 0;
-            for(let i = 1 ; i < dHIndex ; ++i){
-                tempSum += cG["Hand" + i].number;
-            }if(tempSum <= 10){
+            let tempSum = getSum(cG , dHIndex -1);
+            /*for(let i = 1 ; i < dHIndex ; ++i){
+                tempSum += cG["Hand" + i].number;*/
+            if(tempSum <= 10){
                 cG[index].number = 11;
-                tempArr.pop(tempArr.find(value => {typeof value == "number"}))
-                tempArr.pop(tempArr.find(value => {typeof value == "number"}))
+                Helper(tempArr);
+                //tempArr.pop(tempArr.find(value => {typeof value == "number"}))
+                //tempArr.pop(tempArr.find(value => {typeof value == "number"}))
                 let str = tempArr.join("");
                 cG[index].pattern = str + "Ace";
             }else {
                 cG[index].number = 1;
-                tempArr.pop(tempArr.find(value => {typeof value == "number"}))
-                tempArr.pop(tempArr.find(value => {typeof value == "number"}))
+                Helper(tempArr);
+                //tempArr.pop(tempArr.find(value => {typeof value == "number"}))
+                //tempArr.pop(tempArr.find(value => {typeof value == "number"}))
                 let str = tempArr.join("");
                 cG[index].pattern = str + "Ace";
             }
@@ -211,11 +226,11 @@ alert(`딜러의 패는 : ${dealresArr}`);
 
 function Burst_Black(cG, int){
 
-    let tempSum = 0;
-    for(let i = 0 ; i < int ; ++i){
+    let tempSum = getSum(cG, int);
+    /*for(let i = 0 ; i < int ; ++i){
         tempSum += cG["Hand" + (i+1)].number;
-    }
-    alert(tempSum);
+    }*/
+    
     if(tempSum == 21){
         alert("BlackJack!");
         cG["BlackJack"] = true;
@@ -248,30 +263,63 @@ while(true){
         }
     }else continue;
 }
-let sum = 0;
-for(let i = 1 ; i <= Globalint ; ++ i){
+let sum = getSum(yourHand, Globalint);
+
+/*for(let i = 1 ; i <= Globalint ; ++ i){
     sum += yourHand["Hand" + i].number; //반복적...
-}
+}*/
+
+
 alert(`Your hand is ${sum}`);
+let Localint = 2;
 function basicAi(dH){
-    let Localint = 2;
+    
     let tempSum = 0;
     while(true){
+        
         if(tempSum > 17) {
             break;}
         tempSum = 0;
         ++Localint;
         dealercardGen("Hand" + Localint);
         cardProcessor(dealerHand, "Hand" + Localint);
+        tempSum = getSum(dH, Localint);
+
+        Burst_Black(dealerHand, Localint);
+        alert(`딜러의 현재 카드패 : ${tempSum}`);
+        if(dealerHand["BlackJack"]){
+            break;
+        }else if(dealerHand["Burst"]){
+            break;
+        }
         
+        /*
         for(let i = 1 ; i <= Localint ; ++i){
             tempSum += dH["Hand" + i].number;
-        }
+        }*/
        
     }
     return Localint;
 }
+alert("딜러의 턴입니다.~");
 let dealerIndex = basicAi(dealerHand);
-Burst_Black(dealerHand, dealerIndex);
+//Burst_Black(dealerHand, dealerIndex);
+
+///승자 계산...
+
+let dealSum = getSum(dealerHand, Localint);
+if(dealerHand["BlackJack"]&&yourHand["BlackJack"]){
+    alert("무승부!");
+}else if(dealerHand["Burst"]&&yourHand["Burst"]){
+    alert("무승부!");
+}else if(sum == dealSum){
+    alert("무승부!");
+}else if(yourHand["BlackJack"] || sum > dealSum || dealerHand["Burst"]&& !yourHand["Burst"]){
+    alert("You Win!");
+}else if(dealerHand["BlackJack"] || sum < dealSum && !dealerHand["Burst"]){
+    alert("You lost!");
+}
+
+
 
 
