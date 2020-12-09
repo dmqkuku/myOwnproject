@@ -1,6 +1,6 @@
 /*
 Ace 선택지가 제대로 작동하지 않는 듯 하다...
-ai도 안돌아가는 것 같다... 정확히는 아주 높은 빈도로 34같은 터무니없는 숫자가 출력된다...
+ai도 안돌아가는 것 같다... 정확히는 아주 높은 빈도로 '34'같은 터무니없는 숫자가 출력된다... 해결됨...
 
 */ 
 
@@ -36,6 +36,7 @@ dealercardPool["Clover"] = cardClover;
 dealercardPool["Diamond"] = cardDiamond;
 /*
     cardPool과 dealercardPool의 구조는 예를들어 : { "Spade" : Map(cardSpade)}가 된다.
+    각각의 map에는 예를들어 Spade11 : 11 식으로 key와 value가 매칭되어 있다.
     
 */
 
@@ -48,7 +49,9 @@ console.log(cardPool.Spade); // 자동으로 지워지지는 않는다.*/
 
 let yourHand = {};
 let dealerHand = {};
-function dealercardGen(index){
+//손패를 나타내는 객체이다.
+
+function dealercardGen(index){ //index는 Hand1, Hand2와 같이 몇번째 손패인지 표시하는 프로퍼티이다.
     let number = Math.round(Math.random() * 13) + 1;
     let pattern = Math.round(Math.random()* 4 ) + 1;
     if(pattern == 1){
@@ -60,19 +63,22 @@ function dealercardGen(index){
     }else{
         pattern = "Diamond";
     }
-    dealerHand[index] = {};
+    dealerHand[index] = {}; //해당 index에 맞춰서 객체를 value로 추가한다.
+
     if(dealercardPool[pattern].get(pattern + number)){
         dealerHand[index]["number"] = dealercardPool[pattern].get(pattern + number);
         dealerHand[index]["pattern"] = pattern + number;
         dealercardPool[pattern].delete(pattern + number);
         return dealerHand;
+        //index. 예를 들어 Hand1의 객체에 number : 11, pattern : Spade11과 같은 값을 불러와서 입력한뒤, cardPool에서 불러온 카드를 삭제한다.
+        //그리고 위의 if문에서 cardPool의 해당 카드가 존재하는 지 체크하는 것으로 중복된 카드를 뽑는 것을 원천적으로 봉쇄한다.
     }else dealercardGen(index);
 }
 
 
-function cardGen(index){
+function cardGen(cG, cP,  index){
     let number = Math.round(Math.random() * 13) + 1;
-    let pattern = Math.round(Math.random()* 4 ) + 1;
+    let pattern = Math.round(Math.random()* 4 ) + 1; //cG는 yourHand혹은 dealerHand cP는 cardPool
     if(pattern == 1){
         pattern = "Spade";
     }else if(pattern == 2){
@@ -82,25 +88,21 @@ function cardGen(index){
     }else{
         pattern = "Diamond";
     }
-    yourHand[index] = {};
-    if(cardPool[pattern].get(pattern + number)){
-        yourHand[index]["number"] = cardPool[pattern].get(pattern + number);
-        yourHand[index]["pattern"] = pattern + number;
-        cardPool[pattern].delete(pattern + number);
-        alert(yourHand[index]["pattern"]);
-        return yourHand;
-    }else cardGen(index);
+    cG[index] = {};
+    if(cP[pattern].get(pattern + number)){
+        cG[index]["number"] = cP[pattern].get(pattern + number);
+        cG[index]["pattern"] = pattern + number;
+        cP[pattern].delete(pattern + number);
+        alert(cG[index]["pattern"]);
+        return cG;
+    }else cardGen(cG, cP, index);
 }
-cardGen("Hand1");
-cardGen("Hand2");
-dealercardGen("Hand1");
-dealercardGen("Hand2");
-/*
-let cardProcessor1 = [yourHand["FirstHand"].number , yourHand["SecondHand"].number];
-console.log(cardProcessor1);
-let cardProcessor2 = cardProcessor1.forEach((value, index, arr) =>{
-    if()
-})*/
+//현재는 dealerGen과 cardGen이 다르지만 곧 합쳐질것..
+cardGen(yourHand, cardPool, "Hand1");
+cardGen(yourHand, cardPool, "Hand2");
+cardGen(dealerHand, dealercardPool, "Hand1");
+cardGen(dealerHand, dealercardPool,"Hand2");
+//블랙잭 룰에 따라 시작시 두 장의 카드를 딜러와 플레이어가 분배받는다.
 
 function getSum(cG, Iindex){
     let resSum = 0;
@@ -109,6 +111,7 @@ function getSum(cG, Iindex){
     }
     return resSum;
 }
+//앞으로 자주 나올 지금까지의 손패가 얼마만큼인지 sum을 구하는 함수이다.
 
 
 function cardProcessor(cG, index){
@@ -117,29 +120,22 @@ function cardProcessor(cG, index){
         Tarr.pop(Tarr.find(value => {typeof value == "number"}));
         Tarr.pop(Tarr.find(value => {typeof value == "number"}));
     }
-    
+    //cardProcessor내의 helper 함수이다. 자동으로 배열내의 숫자를 두개까지 찾아내서 제거한다.
+    //다른 방법 예를 들어 splice를 사용해도 된다. 이 경우 맨 뒤에서 두 개의 숫자를 제거하면 된다고 알고 있기 때문이다.
+    //근데 이상하게 잘 먹히지가 않아서 다른 방법을 사용했다..
     if(cG){
         if(cG[index].number == 11){
             cG[index].number = 10;
-            /*delete cG[index].pattern[cG[index].pattern.length-1];
-            delete cG[index].pattern[cG[index].pattern.length-1];*/
-            /*tempArr.pop(tempArr.find(value => {typeof value == "number"}))
-            tempArr.pop(tempArr.find(value => {typeof value == "number"}))*/
-            /*let str = "";
-            for(let letter of tempArr){
-                str += letter;
-            }*/
+            
             Helper(tempArr);
             let str = tempArr.join("");
             cG[index].pattern = str + "Jack";
-            //cG[index].pattern.replace(`11`, "Jack");*/
+            
             return cG;
-        }else if(cG[index].number == 12){
-            cG[index].number = 10;
-            Helper(tempArr);
-            //tempArr.pop(tempArr.find(value => {typeof value == "number"}))
-            //tempArr.pop(tempArr.find(value => {typeof value == "number"}))
-            let str = "";
+        }else if(cG[index].number == 12){  //만일 number값이 11, 12, 13 일 경우 각각에 맞춰서 jack, queen,king으로 바꾸어 준다. 
+            cG[index].number = 10;         //앞에서 각각의 Hand에 pattern으로 Spade11라고 저장했다면,
+            Helper(tempArr);               //Spade11을 tempArr로 만들고, tempArr에서 두개의 숫자를 제거한 후, 문자열로 만든다.
+            let str = "";                   //이 경우 join("")을 이용한다. 지금 코드는 바꾸다 말았다.
             for(let letter of tempArr){
                 str += letter;
             }
@@ -149,62 +145,42 @@ function cardProcessor(cG, index){
         }else if(cG[index].number == 13){
             cG[index].number = 10;
             Helper(tempArr);
-            //tempArr.pop(tempArr.find(value => {typeof value == "number"}))
-            //tempArr.pop(tempArr.find(value => {typeof value == "number"}))
-            /*let str = "";
-            //
-            for(let letter of tempArr){
-                str += letter;
-            }*/
+            
             let str = tempArr.join("");
             cG[index].pattern = str + "King";
-            //cG[index].pattern.replace("13", "King");*/
+            
             return cG;
-        }else if((cG[index].number == 1)&&cG == yourHand){
+        }else if((cG[index].number == 1)&&cG == yourHand){  //입력받은 인수인 cG가 yourHand일 경우 prompt를 띄워서 직접 선택한다.
             let inputC = prompt("If you want to play it as a 11 press 'y'", "");
             
             if(inputC == "y"){
                 cG[index].number = 11;
                 Helper(tempArr);
-                //tempArr.splice(-1, 2);???
-                //tempArr.pop(tempArr.find(value => {typeof value == "number"}))
-                //tempArr.pop(tempArr.find(value => {typeof value == "number"}))
-                /*let str = "";
-                for(let letter of tempArr){
-                    str += letter;
-                }*/
+                
                 let str = tempArr.join("");
                 cG[index].pattern = str + "Ace";
             }else {
                 cG[index].number = 1;
                 Helper(tempArr);
-                //tempArr.pop(tempArr.find(value => {typeof value == "number"}))
-                //tempArr.pop(tempArr.find(value => {typeof value == "number"}))
-                /*let str = "";
-                for(let letter of tempArr){
-                    str += letter;
-                }*/
+                
                 let str = tempArr.join("");
                 cG[index].pattern = str + "Ace";
             }
             
-        }else if((cG[index].number == 1)&&cG == dealerHand){
+        }else if((cG[index].number == 1)&&cG == dealerHand){    //만일 dealer의 손패일 경우 조건을 충족할 경우 11 아닐 경우 1이 된다.
             let dHIndex = Number(index[4]);
             let tempSum = getSum(cG , dHIndex -1);
-            /*for(let i = 1 ; i < dHIndex ; ++i){
-                tempSum += cG["Hand" + i].number;*/
+            
             if(tempSum <= 10){
                 cG[index].number = 11;
                 Helper(tempArr);
-                //tempArr.pop(tempArr.find(value => {typeof value == "number"}))
-                //tempArr.pop(tempArr.find(value => {typeof value == "number"}))
+                
                 let str = tempArr.join("");
                 cG[index].pattern = str + "Ace";
             }else {
                 cG[index].number = 1;
                 Helper(tempArr);
-                //tempArr.pop(tempArr.find(value => {typeof value == "number"}))
-                //tempArr.pop(tempArr.find(value => {typeof value == "number"}))
+                
                 let str = tempArr.join("");
                 cG[index].pattern = str + "Ace";
             }
@@ -224,13 +200,10 @@ alert(`당신의 패는 : ${resArr}`);
 let dealresArr = [dealerHand["Hand1"].pattern, dealerHand["Hand2"].pattern];
 alert(`딜러의 패는 : ${dealresArr}`);
 
-function Burst_Black(cG, int){
-
+function Burst_Black(cG, int){//이 함수는 burst 인지 blackJack인지 체크한다. 
+                              //만일 blackjack혹은 burst일 경우 각각의 Hand에 blackjack, burst프로퍼티를 만들고 true로 셋팅한다.
     let tempSum = getSum(cG, int);
-    /*for(let i = 0 ; i < int ; ++i){
-        tempSum += cG["Hand" + (i+1)].number;
-    }*/
-    
+      
     if(tempSum == 21){
         alert("BlackJack!");
         cG["BlackJack"] = true;
@@ -249,7 +222,7 @@ while(true){
         if(inputHS.toLowerCase() == "hit"){
             alert("카드를 한장 더 뽑습니다.");
             ++Globalint;
-            cardGen("Hand" + Globalint);
+            cardGen(yourHand, cardPool, "Hand" + Globalint);
             cardProcessor(yourHand, "Hand" + Globalint);
         }else if(inputHS.toLowerCase() == "stand"){
             alert("Stand!");
@@ -265,11 +238,6 @@ while(true){
 }
 let sum = getSum(yourHand, Globalint);
 
-/*for(let i = 1 ; i <= Globalint ; ++ i){
-    sum += yourHand["Hand" + i].number; //반복적...
-}*/
-
-
 alert(`Your hand is ${sum}`);
 let Localint = 2;
 function basicAi(dH){
@@ -281,7 +249,7 @@ function basicAi(dH){
             break;}
         tempSum = 0;
         ++Localint;
-        dealercardGen("Hand" + Localint);
+        cardGen(dealerHand, dealercardPool, "Hand" + Localint);
         cardProcessor(dealerHand, "Hand" + Localint);
         tempSum = getSum(dH, Localint);
 
@@ -293,17 +261,12 @@ function basicAi(dH){
             break;
         }
         
-        /*
-        for(let i = 1 ; i <= Localint ; ++i){
-            tempSum += dH["Hand" + i].number;
-        }*/
-       
     }
     return Localint;
 }
 alert("딜러의 턴입니다.~");
 let dealerIndex = basicAi(dealerHand);
-//Burst_Black(dealerHand, dealerIndex);
+
 
 ///승자 계산...
 
@@ -320,6 +283,6 @@ if(dealerHand["BlackJack"]&&yourHand["BlackJack"]){
     alert("You lost!");
 }
 
-
+//취합한다음 if else를 돌리는 편이 더 깔끔할 것이다..
 
 
