@@ -106,7 +106,7 @@ let cardProcessor2 = cardProcessor1.forEach((value, index, arr) =>{
 function cardProcessor(cG, index){
     let tempArr = [...cG[index].pattern];
     console.log(tempArr);
-    if(cG == yourHand){
+    if(cG){
         if(cG[index].number == 11){
             cG[index].number = 10;
             /*delete cG[index].pattern[cG[index].pattern.length-1];
@@ -147,7 +147,7 @@ function cardProcessor(cG, index){
             cG[index].pattern = str + "King";
             //cG[index].pattern.replace("13", "King");*/
             return cG;
-        }else if(cG[index].number == 1){
+        }else if((cG[index].number == 1)&&cG == yourHand){
             let inputC = prompt("If you want to play it as a 11 press 'y'", "");
             
             if(inputC == "y"){
@@ -175,6 +175,25 @@ function cardProcessor(cG, index){
                 cG[index].pattern = str + "Ace";
             }
             
+        }else if((cG[index].number == 1)&&cG == dealerHand){
+            let dHIndex = Number(index[4]);
+            let tempSum = 0;
+            for(let i = 1 ; i < dHIndex ; ++i){
+                tempSum += cG["Hand" + i].number;
+            }if(tempSum <= 10){
+                cG[index].number = 11;
+                tempArr.pop(tempArr.find(value => {typeof value == "number"}))
+                tempArr.pop(tempArr.find(value => {typeof value == "number"}))
+                let str = tempArr.join("");
+                cG[index].pattern = str + "Ace";
+            }else {
+                cG[index].number = 1;
+                tempArr.pop(tempArr.find(value => {typeof value == "number"}))
+                tempArr.pop(tempArr.find(value => {typeof value == "number"}))
+                let str = tempArr.join("");
+                cG[index].pattern = str + "Ace";
+            }
+
         }
     }
 }
@@ -195,7 +214,6 @@ function Burst_Black(cG, int){
     let tempSum = 0;
     for(let i = 0 ; i < int ; ++i){
         tempSum += cG["Hand" + (i+1)].number;
-        
     }
     alert(tempSum);
     if(tempSum == 21){
@@ -217,6 +235,7 @@ while(true){
             alert("카드를 한장 더 뽑습니다.");
             ++Globalint;
             cardGen("Hand" + Globalint);
+            cardProcessor(yourHand, "Hand" + Globalint);
         }else if(inputHS.toLowerCase() == "stand"){
             alert("Stand!");
             break;
@@ -227,26 +246,28 @@ while(true){
         }else if(yourHand["Burst"]){
             break;
         }
-        
-
     }else continue;
 }
 let sum = 0;
 for(let i = 1 ; i <= Globalint ; ++ i){
-    sum += yourHand["Hand" + i].number;
+    sum += yourHand["Hand" + i].number; //반복적...
 }
 alert(`Your hand is ${sum}`);
 function basicAi(dH){
     let Localint = 2;
     let tempSum = 0;
     while(true){
-        if(tempSum > 17) {break;}
+        if(tempSum > 17) {
+            break;}
         tempSum = 0;
+        ++Localint;
+        dealercardGen("Hand" + Localint);
+        cardProcessor(dealerHand, "Hand" + Localint);
+        
         for(let i = 1 ; i <= Localint ; ++i){
             tempSum += dH["Hand" + i].number;
         }
-        ++Localint;
-        dealercardGen("Hand" + Localint);
+       
     }
     return Localint;
 }
