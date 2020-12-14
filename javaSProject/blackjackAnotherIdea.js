@@ -1,7 +1,10 @@
 /*
 Ace 선택지가 제대로 작동하지 않는 듯 하다...
-ai도 안돌아가는 것 같다... 정확히는 아주 높은 빈도로 '34'같은 터무니없는 숫자가 출력된다... 해결됨...
+ai도 안돌아가는 것 같다... 정확히는 아주 높은 빈도로 '34'같은 터무니없는 숫자가 출력된다... <해결됨...>
 
+딜러가 너무 잘 진다...
+Ai개선이 필요하다...
+여러 사람이 플레이할 수 있도록 만들어야 한다...
 */ 
 
 
@@ -9,6 +12,7 @@ ai도 안돌아가는 것 같다... 정확히는 아주 높은 빈도로 '34'같
 
 let cardPool = {};
 let dealercardPool = {};
+
 let cardSpade = new Map;
 for(let i = 1 ; i < 14 ; ++i){
     cardSpade.set(`Spade${i}`, i);
@@ -50,19 +54,27 @@ console.log(cardPool.Spade); // 자동으로 지워지지는 않는다.*/
 let yourHand = {};
 let dealerHand = {};
 //손패를 나타내는 객체이다.
-
+let Pattern = {
+    "1" : "Spade",
+    "2" : "Clover",
+    "3" : "Heart",
+    "4" : "Diamond"
+}
+/*
 function dealercardGen(index){ //index는 Hand1, Hand2와 같이 몇번째 손패인지 표시하는 프로퍼티이다.
-    let number = Math.round(Math.random() * 13) + 1;
-    let pattern = Math.round(Math.random()* 4 ) + 1;
-    if(pattern == 1){
+    let number = Math.round(Math.random() * 12) + 1;
+    let pattern = Math.round(Math.random()* 3 ) + 1;
+    
+    pattern = Pattern[pattern];
+    /*if(pattern == 1){
         pattern = "Spade";
     }else if(pattern == 2){
         pattern = "Clover";
     }else if(pattern == 3){
         pattern = "Heart";
     }else{
-        pattern = "Diamond";
-    }
+        pattern = "Diamond";  //ugly??? yes it is ugly
+    }*//*
     dealerHand[index] = {}; //해당 index에 맞춰서 객체를 value로 추가한다.
 
     if(dealercardPool[pattern].get(pattern + number)){
@@ -74,11 +86,14 @@ function dealercardGen(index){ //index는 Hand1, Hand2와 같이 몇번째 손�
         //그리고 위의 if문에서 cardPool의 해당 카드가 존재하는 지 체크하는 것으로 중복된 카드를 뽑는 것을 원천적으로 봉쇄한다.
     }else dealercardGen(index);
 }
-
+*/
 
 function cardGen(cG, cP,  index){
-    let number = Math.round(Math.random() * 13) + 1;
-    let pattern = Math.round(Math.random()* 4 ) + 1; //cG는 yourHand혹은 dealerHand cP는 cardPool
+    let number = Math.round(Math.random() * 12) + 1;
+    let pattern = Math.round(Math.random()* 3 ) + 1; //cG는 yourHand혹은 dealerHand cP는 cardPool
+    
+    pattern = Pattern[pattern];
+    /*
     if(pattern == 1){
         pattern = "Spade";
     }else if(pattern == 2){
@@ -87,7 +102,7 @@ function cardGen(cG, cP,  index){
         pattern = "Heart";
     }else{
         pattern = "Diamond";
-    }
+    }*/
     cG[index] = {};
     if(cP[pattern].get(pattern + number)){
         cG[index]["number"] = cP[pattern].get(pattern + number);
@@ -215,20 +230,41 @@ function Burst_Black(cG, int){//이 함수는 burst 인지 blackJack인지 체�
     return cG;
 }
 
-let Globalint = 2;
+let Globalint = 2; //closure 로 씁시다? 핸드를 자동적으로 증가시키는 것은 쉽지만,,,,
+const handCounter = (function(counter){
+    return {
+        countUp : function(){
+            ++counter;
+        },
+        get count(){
+            return counter;
+        }
+    }
+}(2));
+const dealhandCounter = (function(counter){
+    return {
+        countUp : function(){
+            ++counter;
+        },
+        get count(){
+            return counter;
+        }
+    }
+}(2)); 
 while(true){
     let inputHS = prompt("Hit or Stand?", "")
     if(inputHS){
         if(inputHS.toLowerCase() == "hit"){
             alert("카드를 한장 더 뽑습니다.");
-            ++Globalint;
-            cardGen(yourHand, cardPool, "Hand" + Globalint);
-            cardProcessor(yourHand, "Hand" + Globalint);
+            handCounter.countUp();
+            //++Globalint;
+            cardGen(yourHand, cardPool, "Hand" + handCounter.count);
+            cardProcessor(yourHand, "Hand" + handCounter.count);
         }else if(inputHS.toLowerCase() == "stand"){
             alert("Stand!");
             break;
         }else ;
-        Burst_Black(yourHand, Globalint);
+        Burst_Black(yourHand, handCounter.count);
         if(yourHand["BlackJack"]){
             break;
         }else if(yourHand["Burst"]){
@@ -236,7 +272,7 @@ while(true){
         }
     }else continue;
 }
-let sum = getSum(yourHand, Globalint);
+let sum = getSum(yourHand, handCounter.count);
 
 alert(`Your hand is ${sum}`);
 let Localint = 2;
@@ -248,12 +284,12 @@ function basicAi(dH){
         if(tempSum > 17) {
             break;}
         tempSum = 0;
-        ++Localint;
-        cardGen(dealerHand, dealercardPool, "Hand" + Localint);
-        cardProcessor(dealerHand, "Hand" + Localint);
-        tempSum = getSum(dH, Localint);
+        dealhandCounter.countUp();
+        cardGen(dealerHand, dealercardPool, "Hand" + dealhandCounter.count);
+        cardProcessor(dealerHand, "Hand" + dealhandCounter.count);
+        tempSum = getSum(dH, dealhandCounter.count);
 
-        Burst_Black(dealerHand, Localint);
+        Burst_Black(dealerHand, dealhandCounter.count);
         alert(`딜러의 현재 카드패 : ${tempSum}`);
         if(dealerHand["BlackJack"]){
             break;
@@ -262,7 +298,7 @@ function basicAi(dH){
         }
         
     }
-    return Localint;
+    return dealhandCounter.count;
 }
 alert("딜러의 턴입니다.~");
 let dealerIndex = basicAi(dealerHand);
@@ -270,17 +306,13 @@ let dealerIndex = basicAi(dealerHand);
 
 ///승자 계산...
 
-let dealSum = getSum(dealerHand, Localint);
-if(dealerHand["BlackJack"]&&yourHand["BlackJack"]){
-    alert("무승부!");
-}else if(dealerHand["Burst"]&&yourHand["Burst"]){
-    alert("무승부!");
-}else if(sum == dealSum){
+let dealSum = getSum(dealerHand, dealhandCounter.count);
+if(dealerHand["BlackJack"]&&yourHand["BlackJack"]||dealerHand["Burst"]&&yourHand["Burst"]||sum == dealSum){
     alert("무승부!");
 }else if(yourHand["BlackJack"] || sum > dealSum || dealerHand["Burst"]&& !yourHand["Burst"]){
     alert("You Win!");
 }else if(dealerHand["BlackJack"] || sum < dealSum && !dealerHand["Burst"]){
-    alert("You lost!");
+    alert("You lost!");                                                             //ugly 어떻게든지 이걸 줄여봅시다...
 }
 
 //취합한다음 if else를 돌리는 편이 더 깔끔할 것이다..
