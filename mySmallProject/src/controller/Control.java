@@ -35,7 +35,16 @@ public class Control extends HttpServlet {
 	private DataSource dataFactory;
 	private PreparedStatement pstmt;
 
-
+	protected void doHit(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException{
+		
+	}
+	protected void doStay(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException{
+		
+	}
+	protected void doSplit(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException{
+		
+	}
+	
 	protected void initiateBlackJack(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		Map<String, Card> userHand = new HashMap<String, Card>();
 		Map<String, Card> dealerHand = new HashMap<String, Card>();
@@ -84,7 +93,9 @@ public class Control extends HttpServlet {
 		String query = "{? = call find_user(?, ?) }";		//다른 메소드로 분리시켜 깔끔하게 만들 수 있을것이다.
 		String url = "/Home.jsp";
 		
+		
 		try{
+			conn.setAutoCommit(true);
 			stmt = conn.prepareCall(query);
 			stmt.registerOutParameter(1, java.sql.Types.INTEGER);
 			System.out.println(req.getParameter("id"));
@@ -122,7 +133,7 @@ public class Control extends HttpServlet {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		ResultSet rs = null;
+		
 		String url = "/Home.jsp";
 		
 		String query = "insert into user_table values(? , ?)";
@@ -140,7 +151,7 @@ public class Control extends HttpServlet {
 		
 		try {
 			pstmt.close();
-			rs.close();
+			
 			conn.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
