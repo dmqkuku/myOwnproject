@@ -8,7 +8,7 @@
 </head>
 <body>
 	<h1>This is the Register Page</h1>
-	<form action = "/Control" method = "post">
+	<form action = "/ControlMySql" method = "post">
 		<input type = "hidden" name = "action" value = "register"/>
 		<label for = "id">ID : </label>
 		<input type = "text" name = "id"/><br/>

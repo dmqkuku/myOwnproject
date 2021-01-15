@@ -8,16 +8,15 @@
 	<%
 		Object userObj = request.getAttribute("userHand");
 		Object dealerObj = request.getAttribute("dealerHand");
-		if( !(userObj instanceof Map<?, ?>) || !(dealerObj instanceof Map<?, ?>)){
-			response.sendRedirect("${ConnectionErrorPage}");
-		}else{
-			HashMap<String, Card> userHand = (HashMap<String, Card>) userObj;
-			HashMap<String, Card> dealerHand = (HashMap<String, Card>) dealerObj;
-		}
+		
+	
+		HashMap<String, Card> userHand = (HashMap<String, Card>) userObj;
+		HashMap<String, Card> dealerHand = (HashMap<String, Card>) dealerObj;
+		
 	%>
-	<jsp:useBean id = "map" class = "java.util.HashMap"/>
-	<jsp:setProperty name = "map" property = "userHand" value = "${userHand }" />
-	<jsp:setProperty name= "map" property = "dealerHand" value = "${dealerHand }"/>
+	<jsp:useBean id = "map" class = "model.HashMapBean" scope = "page"/>
+	<jsp:setProperty name = "map" property = "userHand" value = "<%=userHand %>" />
+	<jsp:setProperty name = "map" property = "dealerHand" value = "<%=dealerHand %>"/>
 <html>
 <head>
 <meta charset="EUC-KR">
@@ -30,7 +29,19 @@
 	</section>
 	
 	<Section>
-		
+		<table>
+			<tr>
+				<th>Hand index is</th>
+				<th>Your card is</th>
+			</tr>
+			<c:forEach var = "idx" begin = "1" end = "${userHand.size() }" step = "1">
+			<c:set var = "handIdx" value = "Hand${idx}"/>
+			<tr>
+				<td>${idx} 번째 손패!</td>
+				<td><%= userHand.get("${handIdx}") %></td>
+			</tr>
+			</c:forEach>
+		</table>
 		
 		
 		<form action = "/Control" method = "get">

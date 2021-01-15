@@ -8,7 +8,7 @@
 </head>
 <body>
 	<h1>Hello Welcome To Our Site!</h1>
-	<form method = "post" action = "/Control">
+	<form method = "post" action = "/ControlMySql">
 		<input type = "hidden" name= "action" value = "login"/>
 		<label for = "id">ID : </label>
 		<input type = "text" name = "id"/><br/>
