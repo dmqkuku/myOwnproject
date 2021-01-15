@@ -24,7 +24,7 @@ public class Deck {
 		if(usedNumSet.contains(rawNum)) {
 			LocalCounter lCounter = new LocalCounter();
 			rawNum = irrNumGen(rawNum, lCounter);
-			usedNumSet.add(rawNum);
+			usedNumSet.add(rawNum);	
 			int num = rawNum % 13;						//숫자의 가짓수는 13!
 			int patternedNum = rawNum % 4;				//패턴의 종류는 4가지!
 			Card c = new Card();

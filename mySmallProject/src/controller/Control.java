@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.naming.Context;
@@ -20,7 +21,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import model.Card;
+import model.Dealer;
 import model.Deck;
+import model.User;
 @WebServlet(
 		name = "Control",
 		urlPatterns = "/Control"
@@ -31,21 +34,25 @@ public class Control extends HttpServlet {
 	private CallableStatement stmt;
 	private DataSource dataFactory;
 	private PreparedStatement pstmt;
-	private Deck deck;
-	
-	
-	@Override
-	public void init(ServletConfig config) throws ServletException {
-		// TODO Auto-generated method stub
-		deck = new Deck();
-		
-		super.init(config);
-	}
 
-	protected void doBlackJack(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		Map<String, Card> userHand;
+
+	protected void initiateBlackJack(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		Map<String, Card> userHand = new HashMap<String, Card>();
+		Map<String, Card> dealerHand = new HashMap<String, Card>();
+		Deck deck = new Deck();
+		User mainUser = new User();
+		Dealer dealer = new Dealer();
+		userHand.put(mainUser.getIndex(), deck.numGen());
+		userHand.put(mainUser.getIndex(), deck.numGen());
 		
-		userHand.put(, deck.numGen())
+		dealerHand.put(dealer.getIndex(), deck.numGen());
+		dealerHand.put(dealer.getIndex(), deck.numGen());
+		
+		req.setAttribute("userHand", userHand);
+		req.setAttribute("dealerHand", dealerHand);
+		
+		String url = "/BlackJack.jsp";
+		getServletContext().getRequestDispatcher(url).forward(req, resp);
 	}
 	
 	@Override
@@ -58,15 +65,57 @@ public class Control extends HttpServlet {
 		}else {
 			if(action.equals("goToReg")) {
 				url = "/Register.jsp";
+				getServletContext().getRequestDispatcher(url).forward(req, resp);
+			}
 			}if(action.equals("doBlackJack"))
-				doBlackJack(req, resp);
+				initiateBlackJack(req, resp);
+		}
+		
+	
+	
+	protected void doLogin(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		
+		try {
+			conn = dataFactory.getConnection();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String query = "{? = call find_user(?, ?) }";		//다른 메소드로 분리시켜 깔끔하게 만들 수 있을것이다.
+		String url = "/Home.jsp";
+		
+		try{
+			stmt = conn.prepareCall(query);
+			stmt.registerOutParameter(1, java.sql.Types.INTEGER);
+			System.out.println(req.getParameter("id"));
+			stmt.setString(2, req.getParameter("id"));
+			stmt.setString(3, req.getParameter("password"));
+			boolean res = stmt.execute();
+			System.out.println(res);
+			int result = stmt.getInt(1);
+			System.out.println(result);
+			if(result ==  1) {
+				url = "/BlackJack.jsp";
+			}else if(result == 0) {
+				url = "/Register.jsp";
+			}else
+				url = "/Home.jsp"; //error로 이동하도록
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			stmt.close();
+			conn.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		getServletContext().getRequestDispatcher(url).forward(req, resp);
 	}
-
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+	
+	protected void doRegister(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException{
+		
 		try {
 			conn = dataFactory.getConnection();
 		} catch (SQLException e) {
@@ -74,49 +123,49 @@ public class Control extends HttpServlet {
 			e.printStackTrace();
 		}
 		ResultSet rs = null;
+		String url = "/Home.jsp";
+		
+		String query = "insert into user_table values(? , ?)";
+		try {
+			
+			pstmt = conn.prepareStatement(query);
+			pstmt.setString(1, req.getParameter("id"));
+			pstmt.setString(2, req.getParameter("password"));
+			int result = pstmt.executeUpdate();
+			System.out.println(result);
+			url = "/Home.jsp";
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			pstmt.close();
+			rs.close();
+			conn.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		getServletContext().getRequestDispatcher(url).forward(req, resp);
+	}
+
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		
 		String action = req.getParameter("action");
 		String url = "/Home.jsp";
 		if(action == null) {
 			url = "/Home.jsp";
+			getServletContext().getRequestDispatcher(url).forward(req, resp);
 		}else {
 			if(action.equals("login")) {
-				String query = "{? = call find_user(?, ?) }";				//다른 메소드로 분리시켜 깔끔하게 만들 수 있을것이다.
-					
-				try{
-					stmt = conn.prepareCall(query);
-					stmt.registerOutParameter(1, java.sql.Types.INTEGER);
-					stmt.setString(2, req.getParameter("id"));
-					stmt.setString(3, req.getParameter("password"));
-					boolean res = stmt.execute();
-					System.out.println(res);
-					int result = stmt.getInt(1);
-					System.out.println(result);
-					if(result ==  1) {
-						url = "/BlackJack.jsp";
-					}else if(result == 0) {
-						url = "/Register.jsp";
-					}else
-						url = "/Home.jsp"; //error로 이동하도록
-				}catch(SQLException e) {
-					e.printStackTrace();
-				}
-			}else if(action.equals("register")) {
-				String query = "insert into user_table values(? , ?)";
-				try {
-					pstmt = conn.prepareStatement(query);
-					pstmt.setString(1, req.getParameter("id"));
-					pstmt.setString(2, req.getParameter("password"));
-					int result = pstmt.executeUpdate();
-					System.out.println(result);
-					url = "/Home.jsp";
-				}catch(SQLException e) {
-					e.printStackTrace();
-				}
+				doLogin(req, resp);
+			}
+			 else if(action.equals("register")) {
+				doRegister(req, resp);
 			}
 		}
-		getServletContext().getRequestDispatcher(url).forward(req, resp);
-
-		
 	}
 
 	@Override
@@ -130,7 +179,9 @@ public class Control extends HttpServlet {
 		}catch(NamingException e) {
 			e.printStackTrace();
 		}
+		
 		super.init();
 	}
 
+	
 }
